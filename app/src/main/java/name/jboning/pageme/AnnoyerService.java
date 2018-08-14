@@ -29,6 +29,7 @@ public class AnnoyerService extends Service
     private Vibrator vibrator;
     private MediaPlayer mediaPlayer;
     private long initTime;
+    private Timer reVibrateTimer;
 
     @Override
     public int onStartCommand(Intent intent, int flags, int startId) {
@@ -55,10 +56,11 @@ public class AnnoyerService extends Service
         initialized = true;
         initTime = System.currentTimeMillis();
 
-        AudioAttributes vibrateAttrs = new AudioAttributes.Builder()
-                .setUsage(AudioAttributes.USAGE_ALARM)
-                .build();
-        vibrator.vibrate(new long[]{VIBRATE_DELAY_MILLIS, 500, 100}, 1, vibrateAttrs);
+        vibrate(VIBRATE_DELAY_MILLIS);
+        // If something else (e.g. a notification from some other app) uses the vibrator, our
+        // repeating vibration will be cancelled. So, periodically kick it off again.
+        reVibrateTimer = new Timer();
+        reVibrateTimer.schedule(new ReVibrateTimerTask(), VIBRATE_DELAY_MILLIS + 6000, 6000);
 
         SharedPreferences prefs = getSharedPreferences(MainActivity.SHARED_PREFS, Context.MODE_PRIVATE);
         long silenceUntil = prefs.getLong(MainActivity.PREF_SILENCE_UNTIL, -1);
@@ -69,6 +71,26 @@ public class AnnoyerService extends Service
         mediaPlayer.setOnCompletionListener(this);
         mediaPlayer.setOnPreparedListener(this);
         mediaPlayer.prepareAsync();
+    }
+
+    private void vibrate(long initialDelay) {
+        AudioAttributes vibrateAttrs = new AudioAttributes.Builder()
+                .setUsage(AudioAttributes.USAGE_ALARM)
+                .build();
+        vibrator.vibrate(new long[]{initialDelay, 500, 100}, 1, vibrateAttrs);
+    }
+
+    private class ReVibrateTimerTask extends TimerTask {
+        @Override
+        public void run() {
+            synchronized (cancelledLock) {
+                if (cancelled) {
+                    return;
+                }
+                vibrator.cancel();
+                vibrate(0);
+            }
+        }
     }
 
     private MediaPlayer buildMediaPlayer() {
@@ -139,6 +161,7 @@ public class AnnoyerService extends Service
         if (initialized) {
             synchronized (cancelledLock) {
                 cancelled = true;
+                reVibrateTimer.cancel();
                 vibrator.cancel();
                 mediaPlayer.stop();
                 mediaPlayer.release();
