@@ -12,6 +12,7 @@ public class SwipeConfirm extends AppCompatSeekBar implements SeekBar.OnSeekBarC
     }
 
     private int lastProgress = 0;
+    private boolean confirmed = false;
     private OnConfirmedListener onConfirmedListener;
 
     public SwipeConfirm(Context c) {
@@ -44,10 +45,12 @@ public class SwipeConfirm extends AppCompatSeekBar implements SeekBar.OnSeekBarC
 
     @Override
     public void onProgressChanged(SeekBar seekBar, int progress, boolean fromUser) {
-        if (progress > 25 && lastProgress == 0) {
-            setProgress(0);
+        if (fromUser) {
+            if (progress > 25 && lastProgress == 0) {
+                setProgress(0);
+            }
+            lastProgress = getProgress();
         }
-        lastProgress = getProgress();
     }
 
     @Override
@@ -58,10 +61,22 @@ public class SwipeConfirm extends AppCompatSeekBar implements SeekBar.OnSeekBarC
     @Override
     public void onStopTrackingTouch(SeekBar seekBar) {
         if (seekBar.getProgress() == 100 && lastProgress != 0) {
+            setConfirmed(true);
             onConfirmedListener.onConfirmed(this);
         } else {
             seekBar.setProgress(0);
         }
+    }
+
+    public void setConfirmed(boolean c) {
+        confirmed = c;
+        if (confirmed) {
+            lastProgress = 100;
+        } else {
+            lastProgress = 0;
+        }
+        setProgress(lastProgress);
+        setEnabled(!confirmed);
     }
 
 }

@@ -2,6 +2,7 @@ package name.jboning.pageme;
 
 import android.content.Intent;
 import android.os.Bundle;
+import android.os.PersistableBundle;
 import android.support.v7.app.AppCompatActivity;
 import android.util.Log;
 import android.widget.TextView;
@@ -12,9 +13,16 @@ import org.json.JSONObject;
 public class AlertActivity extends AppCompatActivity {
     private CombinedSmsMessage message;
 
+    private static final String HAS_ACKNOWLEDGED = "hasAcknowledged";
+    private boolean hasAcknowledged = false;
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+        if (savedInstanceState != null) {
+            hasAcknowledged = savedInstanceState.getBoolean(HAS_ACKNOWLEDGED);
+        }
+
         try {
             String jsonData = getIntent().getStringExtra("sms");
             message = CombinedSmsMessage.fromJson(new JSONObject(jsonData));
@@ -32,21 +40,33 @@ public class AlertActivity extends AppCompatActivity {
         swipe.setOnConfirmedListener(new SwipeConfirm.OnConfirmedListener() {
             @Override
             public void onConfirmed(SwipeConfirm swipeConfirm) {
-                AlertActivity.super.onBackPressed();
+                hasAcknowledged = true;
+                stopService(new Intent(AlertActivity.this, AnnoyerService.class));
             }
         });
+        swipe.setConfirmed(hasAcknowledged);
 
-        startService(new Intent(this, AnnoyerService.class));
+        if (!hasAcknowledged) {
+            startService(new Intent(this, AnnoyerService.class));
+        }
+    }
+
+    @Override
+    protected void onSaveInstanceState(Bundle outState) {
+        super.onSaveInstanceState(outState);
+        outState.putBoolean(HAS_ACKNOWLEDGED, hasAcknowledged);
     }
 
     @Override
     public void onBackPressed() {
-        // do nothing (ignore back button press)
+        // Only react to back button once the user has acknowledged the alert.
+        if (hasAcknowledged) {
+            super.onBackPressed();
+        }
     }
 
     @Override
     protected void onDestroy() {
-        stopService(new Intent(this, AnnoyerService.class));
         super.onDestroy();
     }
 }
