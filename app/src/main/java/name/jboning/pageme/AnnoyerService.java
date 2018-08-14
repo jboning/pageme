@@ -1,7 +1,9 @@
 package name.jboning.pageme;
 
 import android.app.Service;
+import android.content.Context;
 import android.content.Intent;
+import android.content.SharedPreferences;
 import android.media.AudioAttributes;
 import android.media.AudioManager;
 import android.media.MediaPlayer;
@@ -57,6 +59,12 @@ public class AnnoyerService extends Service
                 .setUsage(AudioAttributes.USAGE_ALARM)
                 .build();
         vibrator.vibrate(new long[]{VIBRATE_DELAY_MILLIS, 500, 100}, 1, vibrateAttrs);
+
+        SharedPreferences prefs = getSharedPreferences(MainActivity.SHARED_PREFS, Context.MODE_PRIVATE);
+        long silenceUntil = prefs.getLong(MainActivity.PREF_SILENCE_UNTIL, -1);
+        if (silenceUntil > System.currentTimeMillis()) {
+            return;
+        }
 
         mediaPlayer.setOnCompletionListener(this);
         mediaPlayer.setOnPreparedListener(this);

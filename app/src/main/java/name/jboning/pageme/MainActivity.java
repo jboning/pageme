@@ -1,32 +1,45 @@
 package name.jboning.pageme;
 
 import android.Manifest;
+import android.content.Context;
 import android.content.Intent;
+import android.content.SharedPreferences;
 import android.content.pm.PackageManager;
 import android.support.annotation.NonNull;
 import android.support.v4.app.ActivityCompat;
+import android.support.v4.app.DialogFragment;
 import android.support.v4.content.ContextCompat;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.util.Log;
 import android.view.View;
 import android.widget.Button;
-import android.widget.SeekBar;
+import android.widget.TextView;
 
 import org.json.JSONException;
 
+import java.text.DateFormat;
+import java.text.SimpleDateFormat;
+import java.util.Date;
 import java.util.Timer;
 import java.util.TimerTask;
 
-public class MainActivity extends AppCompatActivity {
+public class MainActivity extends AppCompatActivity
+        implements DurationPickerFragment.OnDurationSetListener {
+    SharedPreferences sharedPreferences;
+
+    public static final String SHARED_PREFS = "prefs";
+    public static final String PREF_SILENCE_UNTIL = "silenceUntil";
+
+    private Timer timer = new Timer();
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
 
-        Button b = (Button) findViewById(R.id.button);
-        b.setOnClickListener(new View.OnClickListener() {
+        Button testAlertButton = (Button) findViewById(R.id.testAlert);
+        testAlertButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
                 final Intent i = new Intent(MainActivity.this, AlertActivity.class);
@@ -46,7 +59,70 @@ public class MainActivity extends AppCompatActivity {
             }
         });
 
+        sharedPreferences = getSharedPreferences(SHARED_PREFS, Context.MODE_PRIVATE);
+        renderAudioStatus();
+
+        Button editAudioButton = (Button) findViewById(R.id.editAudioStatus);
+        editAudioButton.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                showAudioEditDialog();
+            }
+        });
+
         permissionsCheck();
+    }
+
+    private void renderAudioStatus() {
+        if (timer == null) {
+            return;
+        }
+        timer.cancel();
+        timer = new Timer();
+
+        TextView audioStatusText = (TextView) findViewById(R.id.audioStatus);
+        long silenceUntil = sharedPreferences.getLong(PREF_SILENCE_UNTIL, -1);
+        if (silenceUntil > System.currentTimeMillis()) {
+            DateFormat formatter = new SimpleDateFormat("HH:mm");
+            audioStatusText.setText("silenced until " + formatter.format(new Date(silenceUntil)));
+            audioStatusText.setTextColor(getColor(R.color.audioOff));
+            timer.schedule(new TimerTask() {
+                @Override
+                public void run() {
+                    runOnUiThread(new Runnable() {
+                        @Override
+                        public void run() {
+                            renderAudioStatus();
+                        }
+                    });
+                }
+            }, silenceUntil - System.currentTimeMillis());
+        } else {
+            audioStatusText.setText("enabled");
+            audioStatusText.setTextColor(getColor(R.color.audioOn));
+        }
+    }
+
+    private void showAudioEditDialog() {
+        DialogFragment f = new DurationPickerFragment();
+        f.show(getSupportFragmentManager(), "duration");
+    }
+
+    @Override
+    public void onDurationSet(int minutes) {
+        updateAudioSilencePref(System.currentTimeMillis() + (1000 * 60 * minutes));
+    }
+
+    @Override
+    public void onDurationCleared() {
+        updateAudioSilencePref(-1);
+    }
+
+    private void updateAudioSilencePref(long until) {
+        SharedPreferences.Editor editor = sharedPreferences.edit();
+        editor.putLong(PREF_SILENCE_UNTIL, until);
+        editor.apply();
+        renderAudioStatus();
     }
 
     private void permissionsCheck() {
@@ -64,5 +140,12 @@ public class MainActivity extends AppCompatActivity {
     public void onRequestPermissionsResult(int requestCode, @NonNull String[] permissions, @NonNull int[] grantResults) {
         super.onRequestPermissionsResult(requestCode, permissions, grantResults);
         permissionsCheck();
+    }
+
+    @Override
+    protected void onDestroy() {
+        timer.cancel();
+        timer = null;
+        super.onDestroy();
     }
 }
