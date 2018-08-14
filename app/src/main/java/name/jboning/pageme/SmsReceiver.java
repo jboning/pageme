@@ -56,6 +56,8 @@ public class SmsReceiver extends BroadcastReceiver {
             return true;
         } else if (sender.equals("89361") && body.toLowerCase().contains("callout")) {
             return true;
+        } else if (body.toLowerCase().contains("test alert")) {
+            return true;
         }
         return false;
     }
