@@ -32,7 +32,7 @@ public class AnnoyerService extends Service
     public int onStartCommand(Intent intent, int flags, int startId) {
         Log.d("AnnoyerService", "Launched");
         annoy();
-        return START_STICKY;
+        return START_NOT_STICKY;
     }
 
     @Nullable
