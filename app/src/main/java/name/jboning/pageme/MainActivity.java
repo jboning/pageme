@@ -15,6 +15,9 @@ import android.widget.SeekBar;
 
 import org.json.JSONException;
 
+import java.util.Timer;
+import java.util.TimerTask;
+
 public class MainActivity extends AppCompatActivity {
 
     @Override
@@ -26,7 +29,7 @@ public class MainActivity extends AppCompatActivity {
         b.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                Intent i = new Intent(MainActivity.this, AlertActivity.class);
+                final Intent i = new Intent(MainActivity.this, AlertActivity.class);
                 CombinedSmsMessage m = new CombinedSmsMessage("example@example.com", 1, "Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua.");
                 try {
                     i.putExtra("sms", m.toJson().toString());
@@ -34,7 +37,12 @@ public class MainActivity extends AppCompatActivity {
                     Log.e("SmsReceiver", "error serializing sms!", e);
                     return;
                 }
-                MainActivity.this.startActivity(i);
+                (new Timer()).schedule(new TimerTask() {
+                    @Override
+                    public void run() {
+                        MainActivity.this.startActivity(i);
+                    }
+                }, 1000);
             }
         });
 
