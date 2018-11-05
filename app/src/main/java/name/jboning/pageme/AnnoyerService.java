@@ -4,6 +4,9 @@ import android.app.Service;
 import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
+import android.hardware.camera2.CameraAccessException;
+import android.hardware.camera2.CameraCharacteristics;
+import android.hardware.camera2.CameraManager;
 import android.media.AudioAttributes;
 import android.media.AudioManager;
 import android.media.MediaPlayer;
@@ -21,7 +24,9 @@ public class AnnoyerService extends Service
         implements MediaPlayer.OnPreparedListener, MediaPlayer.OnCompletionListener {
 
     private static final long VIBRATE_DELAY_MILLIS = 3000;
-    private static final long AUDIO_DELAY_MILLIS = VIBRATE_DELAY_MILLIS + 3000;
+    private static final long TORCH_DELAY_MILLIS = VIBRATE_DELAY_MILLIS + 6000;
+    private static final long TORCH_PERIOD_MILLIS = 500;
+    private static final long AUDIO_DELAY_MILLIS = VIBRATE_DELAY_MILLIS + 15000;
 
     private boolean initialized = false;
     private boolean cancelled = false;
@@ -30,6 +35,8 @@ public class AnnoyerService extends Service
     private MediaPlayer mediaPlayer;
     private long initTime;
     private Timer reVibrateTimer;
+    private Timer torchTimer;
+    private boolean torchesOn = false;
 
     @Override
     public int onStartCommand(Intent intent, int flags, int startId) {
@@ -62,6 +69,9 @@ public class AnnoyerService extends Service
         reVibrateTimer = new Timer();
         reVibrateTimer.schedule(new ReVibrateTimerTask(), VIBRATE_DELAY_MILLIS + 6000, 6000);
 
+        torchTimer = new Timer();
+        torchTimer.schedule(new TorchTimerTask(), TORCH_DELAY_MILLIS, TORCH_PERIOD_MILLIS);
+
         SharedPreferences prefs = getSharedPreferences(MainActivity.SHARED_PREFS, Context.MODE_PRIVATE);
         long silenceUntil = prefs.getLong(MainActivity.PREF_SILENCE_UNTIL, -1);
         if (silenceUntil > System.currentTimeMillis()) {
@@ -89,6 +99,42 @@ public class AnnoyerService extends Service
                 }
                 vibrator.cancel();
                 vibrate(0);
+            }
+        }
+    }
+
+    private class TorchTimerTask extends TimerTask {
+        @Override
+        public void run() {
+            synchronized (cancelledLock) {
+                if (cancelled) {
+                    return;
+                }
+                toggleTorches();
+            }
+        }
+    }
+
+    private void toggleTorches() {
+        torchesOn = !torchesOn;
+        setTorches(torchesOn);
+    }
+
+    private void setTorches(boolean on) {
+        CameraManager cm = getSystemService(CameraManager.class);
+        String[] cameras;
+        try {
+            cameras = cm.getCameraIdList();
+        } catch (CameraAccessException e) {
+            return;
+        }
+        for (String c : cameras) {
+            try {
+                if (cm.getCameraCharacteristics(c).get(CameraCharacteristics.FLASH_INFO_AVAILABLE)) {
+                    cm.setTorchMode(c, on);
+                }
+            } catch (CameraAccessException e) {
+                // ignore
             }
         }
     }
@@ -162,6 +208,8 @@ public class AnnoyerService extends Service
             synchronized (cancelledLock) {
                 cancelled = true;
                 reVibrateTimer.cancel();
+                torchTimer.cancel();
+                setTorches(false);
                 vibrator.cancel();
                 mediaPlayer.stop();
                 mediaPlayer.release();
