@@ -35,6 +35,7 @@ public class SmsReceiver extends BroadcastReceiver {
         Log.d("SmsReceiver", "should alert");
 
         Intent alertIntent = new Intent(context, AlertActivity.class);
+        alertIntent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
         try {
             alertIntent.putExtra("sms", msg.toJson().toString());
         } catch (JSONException e) {
