@@ -45,10 +45,6 @@ public class AlertActivity extends AppCompatActivity {
             }
         });
         swipe.setConfirmed(hasAcknowledged);
-
-        if (!hasAcknowledged) {
-            startService(new Intent(this, AnnoyerService.class));
-        }
     }
 
     @Override
