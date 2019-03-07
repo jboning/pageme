@@ -45,19 +45,49 @@ public class SmsReceiver extends BroadcastReceiver {
         context.startActivity(alertIntent);
     }
 
+    private boolean isBamruPage(CombinedSmsMessage msg) {
+        String sender = msg.getOriginatingAddress();
+        return (sender.equals("4157122678")
+                || sender.equals("8312267814")
+                || sender.equals("8312267820")
+                || sender.equals("8312267823")
+                || sender.equals("8312267824"));
+    }
+
+    private boolean isTransitPage(CombinedSmsMessage msg) {
+        String body = msg.getBody();
+        return (body.endsWith("Have you left home yet?")
+                || body.endsWith("Are you home yet?"));
+    }
+
+    private boolean isResponseConfirmation(CombinedSmsMessage msg) {
+        String body = msg.getBody();
+        return (body.startsWith("Departure time recorded")
+                || body.startsWith("Return time recorded")
+                || (body.startsWith("RSVP") && body.endsWith("recorded.")));
+    }
+
+    private boolean isSmcAlertPage(CombinedSmsMessage msg) {
+        String sender = msg.getOriginatingAddress();
+        return sender.equals("89361");
+    }
+
+    private boolean isTestPage(CombinedSmsMessage msg) {
+        String body = msg.getBody();
+        return body.toLowerCase().contains("test alert")
+                || body.toLowerCase().contains("test page");
+    }
+
     private boolean shouldAlert(CombinedSmsMessage msg) {
         // TODO: make logic configurable.
 
-        String sender = msg.getOriginatingAddress();
-        String body = msg.getBody();
-
-        if (body.startsWith("[BAMRU]")
-                && !(body.endsWith("Have you left home yet?")
-                     || body.endsWith("Are you home yet?"))) {
+        if (isBamruPage(msg)
+                && !isTransitPage(msg)
+                && !isResponseConfirmation(msg)) {
             return true;
-        } else if (sender.equals("89361") && body.toLowerCase().contains("callout")) {
+        } else if (isSmcAlertPage(msg)) {
             return true;
-        } else if (body.toLowerCase().contains("test alert")) {
+        } else if (isTestPage(msg)) {
             return true;
         }
         return false;
