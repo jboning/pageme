@@ -38,7 +38,6 @@ public class SmsReceiver extends BroadcastReceiver {
             return;
         }
         context.startActivity(alertIntent);
-        context.startService(new Intent(context, AnnoyerService.class));
     }
 
     private boolean isBamruPage(CombinedSmsMessage msg) {
