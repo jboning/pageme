@@ -58,8 +58,11 @@ public class SmsReceiver extends BroadcastReceiver {
     private boolean isResponseConfirmation(CombinedSmsMessage msg) {
         String body = msg.getBody();
         return (body.startsWith("Departure time recorded")
+                || body.startsWith("Departure time cleared")
                 || body.startsWith("Return time recorded")
-                || (body.startsWith("RSVP") && body.endsWith("recorded.")));
+                || body.startsWith("Return time cleared")
+                || ((body.startsWith("RSVP") || body.startsWith("Response"))
+                    && (body.endsWith("recorded.") || body.endsWith("successful."))));
     }
 
     private boolean isSmcAlertPage(CombinedSmsMessage msg) {
