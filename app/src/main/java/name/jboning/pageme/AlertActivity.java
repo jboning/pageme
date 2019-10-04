@@ -2,12 +2,13 @@ package name.jboning.pageme;
 
 import android.content.Intent;
 import android.os.Bundle;
-import android.support.v7.app.AppCompatActivity;
 import android.util.Log;
 import android.widget.TextView;
 
 import org.json.JSONException;
 import org.json.JSONObject;
+
+import androidx.appcompat.app.AppCompatActivity;
 
 public class AlertActivity extends AppCompatActivity {
     private CombinedSmsMessage message;
