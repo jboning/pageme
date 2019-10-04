@@ -1,6 +1,5 @@
 <resources>
     <string name="app_name">PageMe</string>
-
-    <!-- TODO: Remove or change this placeholder text -->
-    <string name="hello_blank_fragment">Hello blank fragment</string>
+    <string name="alert_channel_description">Time to spring into action!</string>
+    <string name="alert_channel_name">Pages</string>
 </resources>
