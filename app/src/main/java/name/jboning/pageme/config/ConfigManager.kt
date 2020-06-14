@@ -1,10 +1,28 @@
 package name.jboning.pageme.config
 
 import name.jboning.pageme.config.model.AlertRule
+import name.jboning.pageme.config.model.NotificationPolicy
 import name.jboning.pageme.config.model.PagerConfig
 
 val DEFAULT_CONFIG = PagerConfig(
-        notification_policies = hashMapOf(),
+        notification_policies = hashMapOf(
+                "default" to NotificationPolicy(
+                        actions = arrayListOf(
+                                NotificationPolicy.NotificationStep(
+                                        delay_ms = 3000,
+                                        action = NotificationPolicy.NotificationAction.VIBRATE
+                                ),
+                                NotificationPolicy.NotificationStep(
+                                        delay_ms = 6000,
+                                        action = NotificationPolicy.NotificationAction.FLASH_TORCH
+                                ),
+                                NotificationPolicy.NotificationStep(
+                                        delay_ms = 12000,
+                                        action = NotificationPolicy.NotificationAction.PLAY_SOUND
+                                )
+                        )
+                )
+        ),
         alert_rules = arrayListOf(
                 // BAMRU
                 AlertRule(

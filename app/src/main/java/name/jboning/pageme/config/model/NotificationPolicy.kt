@@ -6,7 +6,7 @@ data class NotificationPolicy(
     val actions: ArrayList<NotificationStep>
 ) {
     data class NotificationStep(
-        var delay_seconds: Float,
+        var delay_ms: Long,
         var action: NotificationAction
     )
 

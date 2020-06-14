@@ -31,7 +31,7 @@
             </intent-filter>
         </receiver>
 
-        <service android:name=".AnnoyerService" />
+        <service android:name=".annoyer.AnnoyerService" />
 
     </application>
 
