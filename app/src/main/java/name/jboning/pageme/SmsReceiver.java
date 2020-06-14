@@ -14,6 +14,12 @@ import android.util.Log;
 
 import org.json.JSONException;
 
+import java.util.ArrayList;
+
+import name.jboning.pageme.config.AlertRuleEvaluator;
+import name.jboning.pageme.config.ConfigManager;
+import name.jboning.pageme.config.model.AlertRule;
+
 /* partly cribbed from https://github.com/babariviere/flutter_sms/blob/master/android/src/main/java/com/babariviere/sms/SmsReceiver.java */
 
 public class SmsReceiver extends BroadcastReceiver {
@@ -76,60 +82,12 @@ public class SmsReceiver extends BroadcastReceiver {
         }
     }
 
-    private boolean isBamruPage(CombinedSmsMessage msg) {
-        String sender = msg.getOriginatingAddress();
-        return (sender.equals("4157122678")
-                || sender.equals("8312267814")
-                || sender.equals("8312267820")
-                || sender.equals("8312267823")
-                || sender.equals("8312267824"));
-    }
-
-    private boolean isTransitPage(CombinedSmsMessage msg) {
-        String body = msg.getBody();
-        return (body.endsWith("Have you left home yet?")
-                || body.endsWith("Are you home yet?"));
-    }
-
-    private boolean isResponseConfirmation(CombinedSmsMessage msg) {
-        String body = msg.getBody();
-        return (body.startsWith("Departure time recorded")
-                || body.startsWith("Departure time cleared")
-                || body.startsWith("Return time recorded")
-                || body.startsWith("Return time cleared")
-                || ((body.startsWith("RSVP") || body.startsWith("Response"))
-                    && (body.endsWith("recorded.") || body.endsWith("successful."))));
-    }
-
-    private boolean isSmcAlertPage(CombinedSmsMessage msg) {
-        String sender = msg.getOriginatingAddress();
-        return sender.equals("89361");
-    }
-
-    private boolean isTestPage(CombinedSmsMessage msg) {
-        String body = msg.getBody();
-        return body.toLowerCase().contains("test alert")
-                || body.toLowerCase().contains("test page");
-    }
-
-    private boolean isPagerdutyPage(CombinedSmsMessage msg) {
-        String body = msg.getBody();
-        return body.startsWith("ALRT");
-    }
-
     private boolean shouldAlert(CombinedSmsMessage msg) {
-        // TODO: make logic configurable.
-
-        if (isBamruPage(msg)
-                && !isTransitPage(msg)
-                && !isResponseConfirmation(msg)) {
-            return true;
-        } else if (isSmcAlertPage(msg)) {
-            return true;
-        } else if (isPagerdutyPage(msg)) {
-            return true;
-        } else if (isTestPage(msg)) {
-            return true;
+        ArrayList<AlertRule> rules = new ConfigManager().getConfig().getAlert_rules();
+        for (AlertRule rule : rules) {
+            if (new AlertRuleEvaluator(rule, msg).matches()) {
+                return true;
+            }
         }
         return false;
     }

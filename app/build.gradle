@@ -1,4 +1,6 @@
 apply plugin: 'com.android.application'
+apply plugin: 'kotlin-android-extensions'
+apply plugin: 'kotlin-android'
 
 android {
     compileSdkVersion 29
@@ -31,4 +33,10 @@ dependencies {
 
     implementation 'androidx.lifecycle:lifecycle-extensions:2.0.0'
     annotationProcessor 'androidx.lifecycle:lifecycle-compiler:2.0.0'
+    implementation "androidx.core:core-ktx:+"
+    implementation "androidx.lifecycle:lifecycle-viewmodel-ktx:2.0.0"
+    implementation "org.jetbrains.kotlin:kotlin-stdlib-jdk7:$kotlin_version"
+}
+repositories {
+    mavenCentral()
 }
