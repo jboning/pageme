@@ -112,6 +112,11 @@ public class SmsReceiver extends BroadcastReceiver {
                 || body.toLowerCase().contains("test page");
     }
 
+    private boolean isPagerdutyPage(CombinedSmsMessage msg) {
+        String body = msg.getBody();
+        return body.startsWith("ALRT");
+    }
+
     private boolean shouldAlert(CombinedSmsMessage msg) {
         // TODO: make logic configurable.
 
@@ -120,6 +125,8 @@ public class SmsReceiver extends BroadcastReceiver {
                 && !isResponseConfirmation(msg)) {
             return true;
         } else if (isSmcAlertPage(msg)) {
+            return true;
+        } else if (isPagerdutyPage(msg)) {
             return true;
         } else if (isTestPage(msg)) {
             return true;
