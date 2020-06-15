@@ -30,7 +30,7 @@ class AlertRuleEvaluator(private val rule: AlertRule, private val msg: CombinedS
     }
 
     private fun evaluateComparison(expr: AlertComparisonExpression): Boolean {
-        val inputField = when (expr.input_field) {
+        val inputField = when (expr.field) {
             InputField.SENDER -> msg.originatingAddress
             InputField.BODY -> msg.body
         }

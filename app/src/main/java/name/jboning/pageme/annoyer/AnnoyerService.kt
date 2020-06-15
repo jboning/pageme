@@ -29,7 +29,7 @@ class AnnoyerService : Service() {
             return
         }
         initialized = true
-        val policy = ConfigManager().getConfig().notification_policies["default"]
+        val policy = ConfigManager().getConfig(this).notification_policies["default"]
         if (policy == null || policy.actions.isEmpty()) {
             Log.d("AnnoyerService", "No notification actions! Not annoying.")
             return

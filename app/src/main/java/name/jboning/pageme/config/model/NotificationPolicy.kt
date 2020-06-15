@@ -1,10 +1,13 @@
 package name.jboning.pageme.config.model
 
+import kotlinx.serialization.Serializable
 import java.util.*
 
+@Serializable
 data class NotificationPolicy(
     val actions: ArrayList<NotificationStep>
 ) {
+    @Serializable
     data class NotificationStep(
         var delay_ms: Long,
         var action: NotificationAction

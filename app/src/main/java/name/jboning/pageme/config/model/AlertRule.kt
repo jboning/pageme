@@ -1,13 +1,18 @@
 package name.jboning.pageme.config.model
 
+import kotlinx.serialization.SerialName
+import kotlinx.serialization.Serializable
 import java.util.*
 
+@Serializable
 data class AlertRule(
     val expression: AlertExpression,
     val notification_policy: String
 ) {
     interface AlertExpression
 
+    @Serializable
+    @SerialName("bool")
     data class AlertBooleanExpression(
         val op: BooleanOp,
         val exprs: ArrayList<AlertExpression>
@@ -17,8 +22,10 @@ data class AlertRule(
         AND, OR, NAND, NOR
     }
 
+    @Serializable
+    @SerialName("cmp")
     data class AlertComparisonExpression(
-        val input_field: InputField,
+        val field: InputField,
         val op: ComparisonOp,
         val value: String
     ) : AlertExpression

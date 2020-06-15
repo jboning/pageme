@@ -38,7 +38,7 @@ public class SmsReceiver extends BroadcastReceiver {
         CombinedSmsMessage msg = CombinedSmsMessage.fromMessageArray(msgs);
 
         Log.d("SmsReceiver", "got message!");
-        if (!shouldAlert(msg)) {
+        if (!shouldAlert(context, msg)) {
             return;
         }
 
@@ -82,8 +82,8 @@ public class SmsReceiver extends BroadcastReceiver {
         }
     }
 
-    private boolean shouldAlert(CombinedSmsMessage msg) {
-        ArrayList<AlertRule> rules = new ConfigManager().getConfig().getAlert_rules();
+    private boolean shouldAlert(Context context, CombinedSmsMessage msg) {
+        ArrayList<AlertRule> rules = new ConfigManager().getConfig(context).getAlert_rules();
         for (AlertRule rule : rules) {
             if (new AlertRuleEvaluator(rule, msg).matches()) {
                 return true;
