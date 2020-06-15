@@ -35,6 +35,7 @@ public class DurationPickerFragment extends DialogFragment
     }
 
     private final DurationOption[] DURATIONS = {
+            new DurationOption(1, "1 minute"),
             new DurationOption(5, "5 minutes"),
             new DurationOption(10, "10 minutes"),
             new DurationOption(15, "15 minutes"),
@@ -82,14 +83,8 @@ public class DurationPickerFragment extends DialogFragment
             @Override
             public void onClick(DialogInterface dialog, int which) {
                 Log.d("DurationPickerFragment", "Cancel");
-                getDialog().cancel();
-            }
-        });
-        b.setNeutralButton("Clear", new DialogInterface.OnClickListener() {
-            @Override
-            public void onClick(DialogInterface dialog, int which) {
-                Log.d("DurationPickerFragment", "Clear");
                 mListener.onDurationCleared();
+                getDialog().cancel();
             }
         });
         return b.create();

@@ -6,6 +6,7 @@ import android.content.Intent
 import android.os.IBinder
 import android.util.Log
 import name.jboning.pageme.MainActivity
+import name.jboning.pageme.MainViewModel
 import name.jboning.pageme.config.ConfigManager
 import name.jboning.pageme.config.model.NotificationPolicy
 import java.util.*
@@ -71,8 +72,8 @@ class AnnoyerService : Service() {
     }
 
     private fun isSilenced(): Boolean {
-        val prefs = getSharedPreferences(MainActivity.SHARED_PREFS, Context.MODE_PRIVATE)
-        val silenceUntil = prefs.getLong(MainActivity.PREF_SILENCE_UNTIL, -1)
+        val prefs = getSharedPreferences(MainViewModel.SHARED_PREFS, Context.MODE_PRIVATE)
+        val silenceUntil = prefs.getLong(MainViewModel.PREF_SILENCE_UNTIL, -1)
         return silenceUntil > System.currentTimeMillis()
     }
 
