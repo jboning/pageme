@@ -4,7 +4,6 @@ import kotlinx.serialization.Serializable
 import java.util.*
 
 @Serializable
-data class PagerConfig(
-    val notification_policies: HashMap<String, NotificationPolicy>,
+data class RulesConfig(
     val alert_rules: ArrayList<AlertRule>
 )

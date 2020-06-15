@@ -1,0 +1,16 @@
+{
+  "actions": [
+    {
+      "delay_ms": 3000,
+      "action": "VIBRATE"
+    },
+    {
+      "delay_ms": 6000,
+      "action": "FLASH_TORCH"
+    },
+    {
+      "delay_ms": 12000,
+      "action": "PLAY_SOUND"
+    }
+  ]
+}

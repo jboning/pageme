@@ -83,7 +83,7 @@ public class SmsReceiver extends BroadcastReceiver {
     }
 
     private boolean shouldAlert(Context context, CombinedSmsMessage msg) {
-        ArrayList<AlertRule> rules = new ConfigManager().getConfig(context).getAlert_rules();
+        ArrayList<AlertRule> rules = new ConfigManager().getRules(context);
         for (AlertRule rule : rules) {
             if (new AlertRuleEvaluator(rule, msg).matches()) {
                 return true;

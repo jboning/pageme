@@ -36,12 +36,21 @@ class MainActivity : AppCompatActivity(), OnDurationSetListener {
             renderStatus()
         }
 
+        viewModel.rules.observe(this) {
+            findViewById<TextView>(R.id.num_rules_text).text = "" + it.size + " rules configured"
+        }
+
         permissionsCheck()
     }
 
     private fun renderStatus() {
-        findViewById<TextView>(R.id.status).text = if (viewModel.silenced.value!!) {
-            "silenced until " + SimpleDateFormat("HH:mm").format(Date(viewModel.silenceUntil.value!!))
+        findViewById<TextView>(R.id.status).text = if (viewModel.rules.value!!.isEmpty()) {
+            "No rules configured!"
+        } else {
+            "Monitoring for pages"
+        }
+        findViewById<TextView>(R.id.status_subheader).text = if(viewModel.silenced.value!!) {
+            "Silenced until " + SimpleDateFormat("HH:mm").format(Date(viewModel.silenceUntil.value!!))
         } else {
             ""
         }

@@ -5,10 +5,9 @@ import android.content.Context
 import android.content.Intent
 import android.os.IBinder
 import android.util.Log
-import name.jboning.pageme.MainActivity
 import name.jboning.pageme.MainViewModel
 import name.jboning.pageme.config.ConfigManager
-import name.jboning.pageme.config.model.NotificationPolicy
+import name.jboning.pageme.config.model.AnnoyerPolicy
 import java.util.*
 
 class AnnoyerService : Service() {
@@ -30,7 +29,7 @@ class AnnoyerService : Service() {
             return
         }
         initialized = true
-        val policy = ConfigManager().getConfig(this).notification_policies["default"]
+        val policy = ConfigManager().getAnnoyerPolicy(this)
         if (policy == null || policy.actions.isEmpty()) {
             Log.d("AnnoyerService", "No notification actions! Not annoying.")
             return
@@ -39,11 +38,11 @@ class AnnoyerService : Service() {
         schedule(policy, 0)
     }
 
-    private fun schedule(policy: NotificationPolicy, step: Int) {
+    private fun schedule(policy: AnnoyerPolicy, step: Int) {
         timer.schedule(AnnoyerTimerTask(policy, step), policy.actions[step].delay_ms)
     }
 
-    private inner class AnnoyerTimerTask(val policy: NotificationPolicy, val step: Int): TimerTask() {
+    private inner class AnnoyerTimerTask(val policy: AnnoyerPolicy, val step: Int): TimerTask() {
         override fun run() {
             synchronized(lock) {
                 if (cancelled) {
@@ -57,13 +56,13 @@ class AnnoyerService : Service() {
         }
     }
 
-    private fun runStep(policy: NotificationPolicy, step: Int) {
+    private fun runStep(policy: AnnoyerPolicy, step: Int) {
         Log.d("AnnoyerService", "Annoyer performing step $step")
         val action = policy.actions[step]
         val annoyer = when (action.action) {
-            NotificationPolicy.NotificationAction.VIBRATE -> VibrateAnnoyer(this@AnnoyerService)
-            NotificationPolicy.NotificationAction.FLASH_TORCH -> TorchAnnoyer(this@AnnoyerService)
-            NotificationPolicy.NotificationAction.PLAY_SOUND -> MediaAnnoyer(this@AnnoyerService)
+            AnnoyerPolicy.NotificationAction.VIBRATE -> VibrateAnnoyer(this@AnnoyerService)
+            AnnoyerPolicy.NotificationAction.FLASH_TORCH -> TorchAnnoyer(this@AnnoyerService)
+            AnnoyerPolicy.NotificationAction.PLAY_SOUND -> MediaAnnoyer(this@AnnoyerService)
         }
         annoyers.add(annoyer)
         if (!(annoyer.isNoisy() && isSilenced())) {

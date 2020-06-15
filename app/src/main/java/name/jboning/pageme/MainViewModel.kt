@@ -7,6 +7,7 @@ import android.util.Log
 import androidx.lifecycle.AndroidViewModel
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
+import name.jboning.pageme.config.ConfigManager
 import java.util.*
 
 class MainViewModel(application: Application) : AndroidViewModel(application) {
@@ -21,6 +22,9 @@ class MainViewModel(application: Application) : AndroidViewModel(application) {
     val silenceUntil: LiveData<Long> = _silenceUntil
     val silenced: LiveData<Boolean> = _silenced
     private val timer = Timer()
+
+    private val _rules = MutableLiveData(ConfigManager().getRules(application.applicationContext))
+    val rules = _rules
 
     private val prefListener = SharedPreferences.OnSharedPreferenceChangeListener { sharedPreferences, s ->
         if (s == PREF_SILENCE_UNTIL) {

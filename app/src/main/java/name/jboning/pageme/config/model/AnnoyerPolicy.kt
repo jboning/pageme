@@ -4,7 +4,7 @@ import kotlinx.serialization.Serializable
 import java.util.*
 
 @Serializable
-data class NotificationPolicy(
+data class AnnoyerPolicy(
     val actions: ArrayList<NotificationStep>
 ) {
     @Serializable

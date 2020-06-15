@@ -9,6 +9,7 @@ import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
 import name.jboning.pageme.R
+import name.jboning.pageme.config.model.RulesConfig
 
 class ImportConfigActivity : AppCompatActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -31,9 +32,9 @@ class ImportConfigActivity : AppCompatActivity() {
             val uri = intent?.data ?: return@withContext false
             val inputStream = contentResolver.openInputStream(uri) ?: return@withContext false
             val config = inputStream.bufferedReader().use {
-                ConfigSerDes().parse(it.readText())
+                ConfigSerDes().json.parse(RulesConfig.serializer(), it.readText())
             }
-            ConfigManager().saveConfig(this@ImportConfigActivity, config)
+            ConfigManager().saveRules(this@ImportConfigActivity, config.alert_rules)
             true
         }
         if (success) {
