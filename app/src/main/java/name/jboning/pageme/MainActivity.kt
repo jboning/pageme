@@ -1,10 +1,12 @@
 package name.jboning.pageme
 
 import android.Manifest
+import android.content.Intent
 import android.content.pm.PackageManager
 import android.os.Bundle
 import android.util.Log
 import android.widget.CompoundButton
+import android.widget.FrameLayout
 import android.widget.TextView
 import androidx.activity.viewModels
 import androidx.appcompat.app.AppCompatActivity
@@ -13,6 +15,7 @@ import androidx.core.content.ContextCompat
 import androidx.fragment.app.DialogFragment
 import androidx.lifecycle.observe
 import name.jboning.pageme.DurationPickerFragment.OnDurationSetListener
+import name.jboning.pageme.config.RulesActivity
 import java.text.SimpleDateFormat
 import java.util.*
 
@@ -38,6 +41,10 @@ class MainActivity : AppCompatActivity(), OnDurationSetListener {
 
         viewModel.rules.observe(this) {
             findViewById<TextView>(R.id.num_rules_text).text = "" + it.size + " rules configured"
+        }
+
+        findViewById<FrameLayout>(R.id.rules_entry).setOnClickListener {
+            startActivity(Intent(this, RulesActivity::class.java))
         }
 
         permissionsCheck()
