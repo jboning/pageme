@@ -18,8 +18,8 @@ public class DurationPickerFragment extends DialogFragment
         implements TimePickerDialog.OnTimeSetListener {
 
     public interface OnDurationSetListener {
-        void onDurationCleared();
         void onDurationSet(int minutes);
+        void onDoneWithDurationSelection();
     }
 
     private class DurationOption {
@@ -83,7 +83,6 @@ public class DurationPickerFragment extends DialogFragment
             @Override
             public void onClick(DialogInterface dialog, int which) {
                 Log.d("DurationPickerFragment", "Cancel");
-                mListener.onDurationCleared();
                 getDialog().cancel();
             }
         });
@@ -99,6 +98,12 @@ public class DurationPickerFragment extends DialogFragment
             throw new ClassCastException(context.toString()
                     + " must implement OnDurationSetListener");
         }
+    }
+
+    @Override
+    public void onDetach() {
+        super.onDetach();
+        mListener.onDoneWithDurationSelection();
     }
 
     @Override

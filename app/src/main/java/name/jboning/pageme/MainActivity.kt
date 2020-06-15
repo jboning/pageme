@@ -56,8 +56,13 @@ class MainActivity : AppCompatActivity(), OnDurationSetListener {
         viewModel.setSilenceUntil(System.currentTimeMillis() + 1000 * 60 * minutes)
     }
 
-    override fun onDurationCleared() {
+    private fun onDurationCleared() {
         viewModel.setSilenceUntil(-1)
+    }
+
+    override fun onDoneWithDurationSelection() {
+        // Ensure that the silence switch is in the proper state (in case no duration was selected)
+        findViewById<CompoundButton>(R.id.silenceSwitch).isChecked = viewModel.silenced.value!!
     }
 
     private fun permissionsCheck() {
