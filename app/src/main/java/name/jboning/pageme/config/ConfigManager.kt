@@ -2,6 +2,7 @@ package name.jboning.pageme.config
 
 import android.content.Context
 import android.util.Log
+import kotlinx.serialization.json.JsonDecodingException
 import name.jboning.pageme.R
 import name.jboning.pageme.config.model.AlertRule
 import name.jboning.pageme.config.model.AnnoyerPolicy
@@ -10,7 +11,13 @@ import java.io.FileNotFoundException
 
 class ConfigManager {
     companion object {
-        private val RULES_PATH = "default.rules.pageme.json"
+        private const val RULES_PATH = "default.rules.pageme.json"
+    }
+
+    var rulesStatus: ConfigStatus? = null
+
+    enum class ConfigStatus {
+        ABSENT, INVALID, VALID
     }
 
     fun getRules(context: Context): ArrayList<AlertRule> {
@@ -19,9 +26,23 @@ class ConfigManager {
             context.openFileInput(RULES_PATH)
         } catch (e: FileNotFoundException) {
             Log.d("ConfigManager", "No rules found")
-            return arrayListOf()
+            rulesStatus = ConfigStatus.ABSENT
+            return getDefaultRules(context)
         }
-        stream.bufferedReader().use {
+        val result = stream.bufferedReader().use {
+            try {
+                ConfigSerDes().json.parse(RulesConfig.serializer(), it.readText()).alert_rules
+            } catch (e: JsonDecodingException) {
+                rulesStatus = ConfigStatus.INVALID
+                return arrayListOf()
+            }
+        }
+        rulesStatus = ConfigStatus.VALID
+        return result
+    }
+
+    fun getDefaultRules(context: Context): ArrayList<AlertRule> {
+        context.resources.openRawResource(R.raw.default_rules).bufferedReader().use {
             return ConfigSerDes().json.parse(RulesConfig.serializer(), it.readText()).alert_rules
         }
     }

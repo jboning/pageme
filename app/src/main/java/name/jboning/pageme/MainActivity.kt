@@ -15,6 +15,7 @@ import androidx.core.content.ContextCompat
 import androidx.fragment.app.DialogFragment
 import androidx.lifecycle.observe
 import name.jboning.pageme.DurationPickerFragment.OnDurationSetListener
+import name.jboning.pageme.config.ConfigManager
 import name.jboning.pageme.config.RulesActivity
 import java.text.SimpleDateFormat
 import java.util.*
@@ -51,15 +52,21 @@ class MainActivity : AppCompatActivity(), OnDurationSetListener {
     }
 
     private fun renderStatus() {
-        findViewById<TextView>(R.id.status).text = if (viewModel.rules.value!!.isEmpty()) {
-            "No rules configured!"
-        } else {
-            "Monitoring for pages"
+        findViewById<TextView>(R.id.status).text = when (viewModel.rulesStatus.value) {
+            ConfigManager.ConfigStatus.VALID -> "Monitoring for pages"
+            ConfigManager.ConfigStatus.INVALID -> "Invalid rule configuration"
+            ConfigManager.ConfigStatus.ABSENT -> "No rules configured"
+            null -> "Something went wrong!"
         }
-        findViewById<TextView>(R.id.status_subheader).text = if(viewModel.silenced.value!!) {
-            "Silenced until " + SimpleDateFormat("HH:mm").format(Date(viewModel.silenceUntil.value!!))
-        } else {
-            ""
+        findViewById<TextView>(R.id.status_subheader).text = when (viewModel.rulesStatus.value) {
+            ConfigManager.ConfigStatus.INVALID -> "Open a .pageme.json file to load configuration."
+            ConfigManager.ConfigStatus.ABSENT -> "Monitoring using default (test) rules. Open a .pageme.json file to load configuration."
+            else ->
+                if(viewModel.silenced.value!!) {
+                    "Silenced until " + SimpleDateFormat("HH:mm").format(Date(viewModel.silenceUntil.value!!)) + "."
+                } else {
+                    ""
+                }
         }
     }
 

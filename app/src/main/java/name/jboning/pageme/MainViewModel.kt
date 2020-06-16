@@ -8,6 +8,7 @@ import androidx.lifecycle.AndroidViewModel
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import name.jboning.pageme.config.ConfigManager
+import name.jboning.pageme.config.model.AlertRule
 import java.util.*
 
 class MainViewModel(application: Application) : AndroidViewModel(application) {
@@ -23,8 +24,11 @@ class MainViewModel(application: Application) : AndroidViewModel(application) {
     val silenced: LiveData<Boolean> = _silenced
     private val timer = Timer()
 
-    private val _rules = MutableLiveData(ConfigManager().getRules(application.applicationContext))
-    val rules = _rules
+    private val configManager = ConfigManager()
+    private val _rules = MutableLiveData(configManager.getRules(application.applicationContext))
+    private val _rulesStatus = MutableLiveData(configManager.rulesStatus)
+    val rules: LiveData<ArrayList<AlertRule>> = _rules
+    val rulesStatus: LiveData<ConfigManager.ConfigStatus?> = _rulesStatus
 
     private val prefListener = SharedPreferences.OnSharedPreferenceChangeListener { sharedPreferences, s ->
         if (s == PREF_SILENCE_UNTIL) {

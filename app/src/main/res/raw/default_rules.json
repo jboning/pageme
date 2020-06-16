@@ -1,75 +1,7 @@
 {
-  "notification_policies": {
-    "default": {
-      "actions": [
-        {
-          "delay_ms": 3000,
-          "action": "VIBRATE"
-        },
-        {
-          "delay_ms": 6000,
-          "action": "FLASH_TORCH"
-        },
-        {
-          "delay_ms": 12000,
-          "action": "PLAY_SOUND"
-        }
-      ]
-    }
-  },
   "alert_rules": [
     {
-      "expression": {
-        "type": "bool",
-        "op": "AND",
-        "exprs": [
-          {
-            "type": "cmp",
-            "field": "SENDER",
-            "op": "MATCHES",
-            "value": "^(4157122678|8312267814|8312267820|8312267823|8312267824)$"
-          },
-          {
-            "type": "bool",
-            "op": "NOR",
-            "exprs": [
-              {
-                "type": "cmp",
-                "field": "BODY",
-                "op": "MATCHES",
-                "value": "(Have you left home yet?|Are you home yet?)$"
-              },
-              {
-                "type": "cmp",
-                "field": "BODY",
-                "op": "MATCHES",
-                "value": "(^(Departure time recorded|Departure time cleared|Return time recorded|Return time cleared))|(^(RSVP|Response).*(recorded\\.|successful\\.))$"
-              }
-            ]
-          }
-        ]
-      },
-      "notification_policy": "default"
-    },
-    {
-      "expression": {
-        "type": "cmp",
-        "field": "SENDER",
-        "op": "EQ",
-        "value": "89361"
-      },
-      "notification_policy": "default"
-    },
-    {
-      "expression": {
-        "type": "cmp",
-        "field": "BODY",
-        "op": "STARTS_WITH",
-        "value": "ALRT"
-      },
-      "notification_policy": "default"
-    },
-    {
+      "name": "Test Rule",
       "expression": {
         "type": "cmp",
         "field": "BODY",
