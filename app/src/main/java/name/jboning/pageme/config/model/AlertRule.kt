@@ -7,7 +7,8 @@ import java.util.*
 @Serializable
 data class AlertRule(
     val expression: AlertExpression,
-    val notification_policy: String
+    val name: String? = null,
+    val notification_policy: String? = "default"
 ) {
     interface AlertExpression
 

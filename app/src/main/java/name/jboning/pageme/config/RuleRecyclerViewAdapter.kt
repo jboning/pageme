@@ -23,7 +23,7 @@ class RuleRecyclerViewAdapter(
     override fun onBindViewHolder(holder: ViewHolder, position: Int) {
         val item = values[position]
         holder.numberView.text = position.toString()
-        holder.nameView.text = "Rule"
+        holder.nameView.text = item.name ?: "(unnamed)"
         holder.contentText.text = item.toString()
         holder.contentView.removeAllViews()
         holder.contentView.addView(AlertRuleRenderer(holder.contentView.context).render(item))
