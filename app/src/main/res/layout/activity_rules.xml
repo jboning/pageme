@@ -10,11 +10,27 @@
         android:layout_width="match_parent"
         android:layout_height="match_parent">
 
-        <androidx.fragment.app.FragmentContainerView
-            android:id="@+id/fragment"
-            android:name="name.jboning.pageme.config.RuleListFragment"
+        <LinearLayout
             android:layout_width="match_parent"
-            android:layout_height="wrap_content" />
+            android:layout_height="wrap_content"
+            android:orientation="vertical">
+
+            <TextView
+                android:id="@+id/textView"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_margin="16dp"
+                android:text="Each incoming SMS message will be compared to each rule. Any matching rule will trigger a pager notification.\n\nImport rules by opening a .pageme.json file."
+                android:textAppearance="@style/TextAppearance.MaterialComponents.Body1" />
+
+            <androidx.fragment.app.FragmentContainerView
+                android:id="@+id/fragment"
+                android:name="name.jboning.pageme.config.RuleListFragment"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content">
+
+            </androidx.fragment.app.FragmentContainerView>
+        </LinearLayout>
     </ScrollView>
 
 </androidx.constraintlayout.widget.ConstraintLayout>
