@@ -1,6 +1,26 @@
 {
   "alert_rules": [
     {
+      "name": "Test Rule, Y/N",
+      "expression": {
+        "type": "cmp",
+        "field": "BODY",
+        "op": "LC_MATCHES",
+        "value": "(test alert|test page).*yes or no?"
+      },
+      "notification_policy": "default",
+      "reply_options": [
+        {
+          "type": "fixed",
+          "reply": "Yes"
+        },
+        {
+          "type": "fixed",
+          "reply": "No"
+        }
+      ]
+    },
+    {
       "name": "Test Rule",
       "expression": {
         "type": "cmp",

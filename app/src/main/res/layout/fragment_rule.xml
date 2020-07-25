@@ -46,4 +46,18 @@
 
     </FrameLayout>
 
+    <TextView
+        android:id="@+id/rule_responses_label"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:text="Responses:"
+        android:visibility="gone" />
+
+    <FrameLayout
+        android:id="@+id/rule_responses_contents"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent">
+
+    </FrameLayout>
+
 </LinearLayout>

@@ -8,7 +8,8 @@ import java.util.*
 data class AlertRule(
         val expression: AlertExpression,
         val name: String? = null,
-        val notification_policy: String? = "default"
+        val notification_policy: String? = "default",
+        val reply_options: ArrayList<ReplyOption>? = null
 ) {
     interface AlertExpression
 
@@ -47,4 +48,19 @@ data class AlertRule(
         LC_CONTAINS,
         LC_MATCHES,
     }
+
+    interface ReplyOption
+
+    @Serializable
+    @SerialName("fixed")
+    data class FixedReplyOption (
+        val reply: String
+    ) : ReplyOption
+
+    @Serializable
+    @SerialName("pattern")
+    data class PatternReplyOption (
+        val label: String,
+        val pattern: String
+    ) : ReplyOption
 }

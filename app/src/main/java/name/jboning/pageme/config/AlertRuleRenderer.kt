@@ -6,22 +6,23 @@ import android.view.ViewGroup
 import android.widget.LinearLayout
 import android.widget.TextView
 import name.jboning.pageme.config.model.AlertRule
+import java.lang.AssertionError
 
-class AlertRuleRenderer(private val context: Context) {
+class AlertRuleRenderer(private val context: Context, private val rule: AlertRule) {
     companion object {
         private val INDENT_DP = 16
     }
 
     private val density = context.resources.displayMetrics.density
 
-    fun render(rule: AlertRule): View {
+    fun renderExpression(): View {
         return LinearLayout(context).apply {
             orientation = LinearLayout.VERTICAL
-            renderInto(rule.expression, -1, this)
+            renderExpressionInto(rule.expression, 0, this)
         }
     }
 
-    private fun renderInto(expr: AlertRule.AlertExpression, depth: Int, container: ViewGroup) {
+    private fun renderExpressionInto(expr: AlertRule.AlertExpression, depth: Int, container: ViewGroup) {
         when (expr) {
             is AlertRule.AlertBooleanExpression -> renderBooleanInto(expr, depth, container)
             is AlertRule.AlertComparisonExpression -> renderComparisonInto(expr, depth, container)
@@ -44,7 +45,7 @@ class AlertRuleRenderer(private val context: Context) {
                     AlertRule.BooleanOp.OR, AlertRule.BooleanOp.NOR -> "OR"
                 })
             }
-            renderInto(subExpr, innerDepth, container)
+            renderExpressionInto(subExpr, innerDepth, container)
         }
     }
 
@@ -84,7 +85,25 @@ class AlertRuleRenderer(private val context: Context) {
             AlertRule.ComparisonOp.LC_STARTS_WITH
                 -> "starts with"
         }
-        addTextView(container, maxOf(depth, 0), "${field}${lc} ${op} '${expr.value}'")
+        addTextView(container, maxOf(depth, 1), "${field}${lc} ${op} '${expr.value}'")
+    }
+
+    fun renderReplies(): View {
+        return LinearLayout(context).apply {
+            orientation = LinearLayout.VERTICAL
+            rule.reply_options?.forEach {
+                renderReplyInto(it, this)
+            }
+        }
+    }
+
+    private fun renderReplyInto(reply: AlertRule.ReplyOption, container: ViewGroup) {
+        val text = when (reply) {
+            is AlertRule.FixedReplyOption -> reply.reply
+            is AlertRule.PatternReplyOption -> "${reply.label}: from pattern '${reply.pattern}'"
+            else -> throw AssertionError("wtf")  // for some reason the compiler thinks the list of cases isn't exhaustive
+        }
+        addTextView(container, 1, text)
     }
 
     private fun addTextView(container: ViewGroup, depth: Int, text: String) {

@@ -10,6 +10,10 @@ class ConfigSerDes {
             AlertRule.AlertBooleanExpression::class with AlertRule.AlertBooleanExpression.serializer()
             AlertRule.AlertComparisonExpression::class with AlertRule.AlertComparisonExpression.serializer()
         }
+        polymorphic(AlertRule.ReplyOption::class) {
+            AlertRule.FixedReplyOption::class with AlertRule.FixedReplyOption.serializer()
+            AlertRule.PatternReplyOption::class with AlertRule.PatternReplyOption.serializer()
+        }
     }
 
     val json = Json(context = configModule)

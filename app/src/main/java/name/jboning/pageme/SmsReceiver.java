@@ -38,20 +38,15 @@ public class SmsReceiver extends BroadcastReceiver {
         CombinedSmsMessage msg = CombinedSmsMessage.fromMessageArray(msgs);
 
         Log.d("SmsReceiver", "got message!");
-        if (!shouldAlert(context, msg)) {
+        AlertRule rule = findFirstTriggeredRule(context, msg);
+        if (rule == null) {
             return;
         }
 
         Log.d("SmsReceiver", "should alert");
 
-        Intent alertIntent = new Intent(context, AlertActivity.class);
+        Intent alertIntent = AlertActivity.getIntent(context, msg, rule);
         alertIntent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
-        try {
-            alertIntent.putExtra("sms", msg.toJson().toString());
-        } catch (JSONException e) {
-            Log.e("SmsReceiver", "error serializing sms!", e);
-            return;
-        }
 
         if (Build.VERSION.SDK_INT < Build.VERSION_CODES.Q) {
             context.startActivity(alertIntent);
@@ -82,14 +77,14 @@ public class SmsReceiver extends BroadcastReceiver {
         }
     }
 
-    private boolean shouldAlert(Context context, CombinedSmsMessage msg) {
+    private AlertRule findFirstTriggeredRule(Context context, CombinedSmsMessage msg) {
         ArrayList<AlertRule> rules = new ConfigManager().getRules(context);
         for (AlertRule rule : rules) {
             if (new AlertRuleEvaluator(rule, msg).matches()) {
-                return true;
+                return rule;
             }
         }
-        return false;
+        return null;
     }
 
     private void createNotificationChannel(Context context) {

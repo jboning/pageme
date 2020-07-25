@@ -89,12 +89,15 @@ class MainActivity : AppCompatActivity(), OnDurationSetListener {
     }
 
     private fun permissionsCheck() {
+        val permissions = arrayOf(
+            Manifest.permission.RECEIVE_SMS,
+            Manifest.permission.SEND_SMS,
+            Manifest.permission.VIBRATE
+        )
         Log.d("MainActivity", "checking permissions")
-        if (ContextCompat.checkSelfPermission(this, Manifest.permission.RECEIVE_SMS) != PackageManager.PERMISSION_GRANTED
-                || ContextCompat.checkSelfPermission(this, Manifest.permission.VIBRATE) != PackageManager.PERMISSION_GRANTED) {
+        if (permissions.any { perm -> ContextCompat.checkSelfPermission(this, perm) != PackageManager.PERMISSION_GRANTED }) {
             Log.d("MainActivity", "requesting permissions")
-            ActivityCompat.requestPermissions(this, arrayOf(Manifest.permission.RECEIVE_SMS, Manifest.permission.VIBRATE),
-                    0)
+            ActivityCompat.requestPermissions(this, permissions, 0)
         }
     }
 

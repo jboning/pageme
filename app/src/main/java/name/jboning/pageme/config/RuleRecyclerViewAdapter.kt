@@ -25,7 +25,15 @@ class RuleRecyclerViewAdapter(
         holder.nameView.text = item.name ?: "(unnamed)"
         holder.contentText.text = item.toString()
         holder.contentView.removeAllViews()
-        holder.contentView.addView(AlertRuleRenderer(holder.contentView.context).render(item))
+        val renderer = AlertRuleRenderer(holder.contentView.context, item)
+        holder.contentView.addView(renderer.renderExpression())
+        holder.responsesContent.removeAllViews()
+        if (item.reply_options?.isNotEmpty() == true) {
+            holder.responsesLabel.visibility = View.VISIBLE
+            holder.responsesContent.addView(renderer.renderReplies())
+        } else {
+            holder.responsesLabel.visibility = View.GONE
+        }
     }
 
     override fun getItemCount(): Int = values.size
@@ -35,6 +43,8 @@ class RuleRecyclerViewAdapter(
         val nameView: TextView = view.findViewById(R.id.rule_name)
         val contentView: ViewGroup = view.findViewById(R.id.rule_contents)
         val contentText: TextView = view.findViewById(R.id.rule_contents_text)
+        val responsesLabel: TextView = view.findViewById(R.id.rule_responses_label)
+        val responsesContent: ViewGroup = view.findViewById(R.id.rule_responses_contents)
 
         override fun toString(): String {
             return super.toString() + " '" + contentText.text + "'"
