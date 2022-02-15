@@ -8,6 +8,7 @@ import androidx.lifecycle.lifecycleScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
+import kotlinx.serialization.json.Json
 import name.jboning.pageme.R
 import name.jboning.pageme.config.model.RulesConfig
 
@@ -32,7 +33,7 @@ class ImportConfigActivity : AppCompatActivity() {
             val uri = intent?.data ?: return@withContext false
             val inputStream = contentResolver.openInputStream(uri) ?: return@withContext false
             val config = inputStream.bufferedReader().use {
-                ConfigSerDes().json.parse(RulesConfig.serializer(), it.readText())
+                Json.decodeFromString(RulesConfig.serializer(), it.readText())
             }
             ConfigManager().saveRules(this@ImportConfigActivity, config.alert_rules)
             true

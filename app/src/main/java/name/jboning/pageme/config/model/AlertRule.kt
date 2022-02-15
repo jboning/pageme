@@ -11,14 +11,15 @@ data class AlertRule(
         val notification_policy: String? = "default",
         val reply_options: ArrayList<ReplyOption>? = null
 ) {
-    interface AlertExpression
+    @Serializable
+    sealed class AlertExpression
 
     @Serializable
     @SerialName("bool")
     data class AlertBooleanExpression(
         val op: BooleanOp,
         val exprs: ArrayList<AlertExpression>
-    ) : AlertExpression
+    ) : AlertExpression()
 
     enum class BooleanOp {
         AND, OR, NAND, NOR
@@ -30,7 +31,7 @@ data class AlertRule(
         val field: InputField,
         val op: ComparisonOp,
         val value: String
-    ) : AlertExpression
+    ) : AlertExpression()
 
     enum class InputField {
         SENDER, BODY
@@ -49,18 +50,19 @@ data class AlertRule(
         LC_MATCHES,
     }
 
-    interface ReplyOption
+    @Serializable
+    sealed class ReplyOption
 
     @Serializable
     @SerialName("fixed")
     data class FixedReplyOption (
         val reply: String
-    ) : ReplyOption
+    ) : ReplyOption()
 
     @Serializable
     @SerialName("pattern")
     data class PatternReplyOption (
         val label: String,
         val pattern: String
-    ) : ReplyOption
+    ) : ReplyOption()
 }

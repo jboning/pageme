@@ -12,8 +12,8 @@ import android.widget.TextView
 import androidx.activity.viewModels
 import androidx.appcompat.app.AppCompatActivity
 import androidx.lifecycle.Observer
+import kotlinx.serialization.json.Json
 import name.jboning.pageme.annoyer.AnnoyerService
-import name.jboning.pageme.config.ConfigSerDes
 import name.jboning.pageme.config.model.AlertRule
 import org.json.JSONObject
 import java.lang.AssertionError
@@ -27,7 +27,7 @@ class AlertActivity : AppCompatActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         message = CombinedSmsMessage.fromJson(JSONObject(intent.getStringExtra(EXTRA_SMS)!!))
-        alertRule = ConfigSerDes().json.parse(AlertRule.serializer(), intent.getStringExtra(EXTRA_ALERT_RULE)!!)
+        alertRule = Json.decodeFromString(AlertRule.serializer(), intent.getStringExtra(EXTRA_ALERT_RULE)!!)
 
         setContentView(R.layout.activity_alert)
         val messageView = findViewById<View>(R.id.message) as TextView
@@ -118,7 +118,7 @@ class AlertActivity : AppCompatActivity() {
         fun getIntent(context: Context, msg: CombinedSmsMessage, rule: AlertRule): Intent {
             val intent = Intent(context, AlertActivity::class.java)
             intent.putExtra(EXTRA_SMS, msg.toJson().toString())
-            intent.putExtra(EXTRA_ALERT_RULE, ConfigSerDes().json.stringify(AlertRule.serializer(), rule))
+            intent.putExtra(EXTRA_ALERT_RULE, Json.encodeToString(AlertRule.serializer(), rule))
             return intent
         }
     }
