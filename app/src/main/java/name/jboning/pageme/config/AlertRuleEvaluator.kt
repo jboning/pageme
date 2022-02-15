@@ -13,7 +13,6 @@ class AlertRuleEvaluator(private val rule: AlertRule, private val msg: CombinedS
         return when (expr) {
             is AlertBooleanExpression -> evaluateBoolean(expr)
             is AlertComparisonExpression -> evaluateComparison(expr)
-            else -> throw java.lang.RuntimeException("!!!")
         }
     }
 
