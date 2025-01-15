@@ -53,8 +53,9 @@ public class SmsReceiver extends BroadcastReceiver {
         } else {
             createNotificationChannel(context);
 
+
             PendingIntent fullScreenPendingIntent = PendingIntent.getActivity(context, 0,
-                    alertIntent, PendingIntent.FLAG_UPDATE_CURRENT);
+                    alertIntent, PendingIntent.FLAG_UPDATE_CURRENT | PendingIntent.FLAG_IMMUTABLE);
 
             Notification.Builder notificationBuilder =
                     new Notification.Builder(context, ALERT_CHANNEL_ID)
