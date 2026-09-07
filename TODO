@@ -1,0 +1,11 @@
+- configurable notification rules
+  x data model
+  x interpreter
+  x visualizer
+  x storage + import
+  - editor
+  - export
+- responses
+- play store
+- better silencing UI (selector)
+- clear notification when acknowledged
